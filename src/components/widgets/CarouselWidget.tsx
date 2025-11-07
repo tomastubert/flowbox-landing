@@ -11,8 +11,8 @@ interface CarouselWidgetProps {
 }
 
 export default function CarouselWidget({ isTestMode, isServerSide }: CarouselWidgetProps) {
-  const prodflowKey = "DEMO_CAROUSEL_FLOW_KEY"; // Replace with actual Carousel flow key
-  const testFlowKey = "TEST_CAROUSEL_FLOW_KEY"; // Replace with actual test flow key
+  const prodflowKey = ""; // Replace with actual Carousel flow key
+  const testFlowKey = "8-XCNg_UR0alSi3IABAM5w"; // Replace with actual test flow key
   const flowKey = isTestMode ? testFlowKey : prodflowKey;
   return (
     <Box

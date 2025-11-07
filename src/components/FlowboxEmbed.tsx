@@ -12,7 +12,7 @@ interface FlowboxEmbedProps {
 
 export default function FlowboxEmbed({
   flowKey,
-  locale,
+  locale = "en-eu",
   containerId,
   isTest = false,
   isServerSide = false,
@@ -31,13 +31,13 @@ export default function FlowboxEmbed({
         window.flowbox("init", {
           container: `#${containerId}`,
           key: flowKey,
-          ...(locale && { locale }),
-          ...(isServerSide && { lazyLoad: true }),
+          locale: locale,
+          ...(isServerSide && { lazyLoad: false }),
         });
       }
     };
 
-    const scriptId = `flowbox-js-embed-${isTest ? "test" : "prod"}`;
+    const scriptId = `flowbox-js-embed-${isTest ? "test" : "prod"}-${flowKey}`;
     const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null;
 
     const handleScriptError = () => {
@@ -55,23 +55,25 @@ export default function FlowboxEmbed({
       };
       script.onerror = handleScriptError;
       document.body.appendChild(script);
-    } else if (scriptLoadedRef.current || window.flowbox) {
-      initializeFlowbox();
     } else {
-      existingScript.addEventListener("load", initializeFlowbox);
-      existingScript.addEventListener("error", handleScriptError);
-      return () => {
-        existingScript.removeEventListener("load", initializeFlowbox);
-        existingScript.removeEventListener("error", handleScriptError);
-      };
+      initializeFlowbox();
     }
+
+    // // Cleanup: remove script on unmount
+    // return () => {
+    //   const scriptToRemove = document.getElementById(scriptId);
+    //   if (scriptToRemove && scriptToRemove.parentNode) {
+    //     scriptToRemove.parentNode.removeChild(scriptToRemove);
+    //     console.log(`Removed Flowbox script: ${scriptId}`);
+    //     if (window.flowbox) {
+    //       window.flowbox('destroy', {
+    //         container: `#${containerId}`,
+    //       });
+    //     }
+    //   }
+    // };
   }, [flowKey, locale, containerId, isTest, isServerSide]);
 
-  // Reset scriptError when any prop changes
-  useEffect(() => {
-    setScriptError(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flowKey, locale, containerId, isTest]);
   return (
     <>
       <div id={containerId} ref={containerRef}></div>

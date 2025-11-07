@@ -12,7 +12,7 @@ interface TikTokWidgetProps {
 
 export default function TikTokWidget({ isTestMode, isServerSide }: TikTokWidgetProps) {
   const prodflowKey = ""; // Replace with actual TikTok flow key
-  const testFlowKey = "RPl-DVyQS2aSlF2C1sa_jQ"; // Replace with actual test flow key
+  const testFlowKey = "loo_zhuQRQK0IjATvAhd4w"; // Replace with actual test flow key
   const flowKey = isTestMode ? testFlowKey : prodflowKey;
   return (
     <Box

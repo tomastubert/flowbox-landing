@@ -156,9 +156,10 @@ export default function FlowTester() {
         {isRendered && flowKey ? (
           <FlowboxEmbed
             key={renderKey}
-            flowKey={flowKey.trim()}
-            locale={locale}
+            flowKey={flowKey}
+            // locale={locale}
             containerId={`flowbox-tester-${renderKey}`}
+            isTest={isTest}
           />
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", p: 4 }}>

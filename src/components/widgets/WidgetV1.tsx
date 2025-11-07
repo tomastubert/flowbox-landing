@@ -11,8 +11,8 @@ interface WidgetV1Props {
 }
 
 export default function WidgetV1({ isTestMode, isServerSide }: WidgetV1Props) {
-  const prodflowKey = "DEMO_V1_FLOW_KEY"; // Replace with actual V1 flow key
-  const testFlowKey = "TEST_V1_FLOW_KEY"; // Replace with actual test flow key
+  const prodflowKey = ""; // Replace with actual V1 flow key
+  const testFlowKey = "0RFLoizNS96DE7sZvTrtgQ"; // Replace with actual test flow key
   const flowKey = isTestMode ? testFlowKey : prodflowKey;
 
   return (

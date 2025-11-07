@@ -11,8 +11,8 @@ interface PhotowallWidgetProps {
 }
 
 export default function PhotowallWidget({ isTestMode, isServerSide }: PhotowallWidgetProps) {
-  const prodflowKey = "DEMO_PHOTOWALL_FLOW_KEY"; // Replace with actual photowall flow key
-  const testFlowKey = "TEST_PHOTOWALL_FLOW_KEY"; // Replace with actual test flow key
+  const prodflowKey = ""; // Replace with actual photowall flow key
+  const testFlowKey = "qkhRWdwjSUqPOAkOfSTMRw"; // Replace with actual test flow key
   const flowKey = isTestMode ? testFlowKey : prodflowKey;
   return (
     <Box
