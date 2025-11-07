@@ -1,49 +1,20 @@
 "use client";
 
-import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
+import FlowboxEmbed from "../FlowboxEmbed";
 
-declare global {
-  interface Window {
-    flowbox?: (action: string, options: { container: string; key: string; locale: string }) => void;
-  }
+interface WidgetV1Props {
+  isTestMode?: boolean;
+  isServerSide?: boolean;
 }
 
-const FlowboxV1EmbedFlow = () => {
-  const flowboxKey = "DEMO_V1_FLOW_KEY"; // Replace with actual V1 flow key
+export default function WidgetV1({ isTestMode, isServerSide }: WidgetV1Props) {
+  const prodflowKey = "DEMO_V1_FLOW_KEY"; // Replace with actual V1 flow key
+  const testFlowKey = "TEST_V1_FLOW_KEY"; // Replace with actual test flow key
+  const flowKey = isTestMode ? testFlowKey : prodflowKey;
 
-  useEffect(() => {
-    const initializeFlowbox = () => {
-      if (window.flowbox) {
-        window.flowbox("init", {
-          container: "#js-flowbox-flow-v1",
-          key: flowboxKey,
-          locale: "en-US"
-        });
-      }
-    };
-
-    const scriptId = "flowbox-js-embed";
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.async = true;
-      script.src = "https://connect.getflowbox.com/flowbox.js";
-      script.onload = initializeFlowbox;
-      document.body.appendChild(script);
-    } else {
-      initializeFlowbox();
-    }
-  }, []);
-
-  return (
-    <div id="js-flowbox-flow-v1"></div>
-  );
-};
-
-export default function WidgetV1() {
   return (
     <Box
       sx={{
@@ -60,22 +31,15 @@ export default function WidgetV1() {
           Basic grid implementation
         </Typography>
       </Box>
-      
+
       {/* Flowbox V1 Embed */}
-      <FlowboxV1EmbedFlow />
-      
-      {/* Fallback content when no flow key is configured */}
-      <Box sx={{ textAlign: "center", py: 8, color: "text.secondary" }}>
-        <Typography variant="h6" gutterBottom>
-          Flowbox V1 Widget Demo
-        </Typography>
-        <Typography variant="body2">
-          Configure your V1 flow key to display actual content
-        </Typography>
-        <Typography variant="caption" sx={{ display: "block", mt: 2 }}>
-          Flow Key: {"DEMO_V1_FLOW_KEY"}
-        </Typography>
-      </Box>
+      <FlowboxEmbed
+        key={flowKey}
+        flowKey={flowKey.trim()}
+        containerId={`flowbox-tester-${flowKey}`}
+        isTest={isTestMode}
+        isServerSide={isServerSide}
+      />
     </Box>
   );
 }

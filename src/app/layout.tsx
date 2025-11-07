@@ -4,7 +4,6 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import Navbar from '@/components/Navbar';
-import "./globals.css";
 
 const inter = Inter({
   weight: ['300', '400', '500', '700'],
@@ -25,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="antialiased">
+      <body>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <Navbar />

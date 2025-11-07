@@ -14,7 +14,9 @@ export default function Navbar() {
 
   const navItems = [
     { label: "Server Side", path: "/" },
+    { label: "Server Side Testing", path: "/server-side-test" },
     { label: "Client Side", path: "/client-side" },
+    { label: "Client Side Testing", path: "/client-side-test" },
     { label: "Flow Tester", path: "/flow-tester" },
   ];
 

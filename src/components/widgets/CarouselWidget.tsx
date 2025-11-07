@@ -1,50 +1,19 @@
 "use client";
 
-import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
+import FlowboxEmbed from "../FlowboxEmbed";
 
-declare global {
-  interface Window {
-    flowbox?: (action: string, options: { container: string; key: string; locale: string }) => void;
-  }
+interface CarouselWidgetProps {
+  isTestMode?: boolean;
+  isServerSide?: boolean;
 }
 
-const FlowboxCarouselEmbedFlow = () => {
-  const flowboxKey = "DEMO_CAROUSEL_FLOW_KEY"; // Replace with actual carousel flow key
-
-  useEffect(() => {
-    const initializeFlowbox = () => {
-      if (window.flowbox) {
-        window.flowbox("init", {
-          container: "#js-flowbox-flow-carousel",
-          key: flowboxKey,
-          locale: "en-US"
-        });
-      }
-    };
-
-    const scriptId = "flowbox-js-embed";
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.async = true;
-      script.src = "https://connect.getflowbox.com/flowbox.js";
-      script.onload = initializeFlowbox;
-      document.body.appendChild(script);
-    } else {
-      initializeFlowbox();
-    }
-  }, []);
-
-  return (
-    <div id="js-flowbox-flow-carousel"></div>
-  );
-};
-
-export default function CarouselWidget() {
-
+export default function CarouselWidget({ isTestMode, isServerSide }: CarouselWidgetProps) {
+  const prodflowKey = "DEMO_CAROUSEL_FLOW_KEY"; // Replace with actual Carousel flow key
+  const testFlowKey = "TEST_CAROUSEL_FLOW_KEY"; // Replace with actual test flow key
+  const flowKey = isTestMode ? testFlowKey : prodflowKey;
   return (
     <Box
       sx={{
@@ -64,27 +33,13 @@ export default function CarouselWidget() {
       </Box>
 
       {/* Flowbox Carousel Embed */}
-      <FlowboxCarouselEmbedFlow />
-
-      {/* Fallback content when no flow key is configured */}
-      <Box sx={{ textAlign: "center", py: 8, color: "text.secondary" }}>
-        <Typography variant="h6" gutterBottom>
-          Flowbox V2 Carousel Widget
-        </Typography>
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          This widget displays content in a horizontal carousel format with navigation arrows
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Features: Product tagging, User avatars, Engagement metrics, Smooth navigation
-        </Typography>
-        <Typography variant="caption" sx={{ display: "block", mt: 2 }}>
-          Flow Key: {"DEMO_CAROUSEL_FLOW_KEY"}
-        </Typography>
-      </Box>
-
-      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 3, textAlign: "center" }}>
-        Configure your carousel flow key to display actual UGC content with product links
-      </Typography>
+      <FlowboxEmbed
+        key={flowKey}
+        flowKey={flowKey.trim()}
+        containerId={`flowbox-tester-${flowKey}`}
+        isTest={isTestMode}
+        isServerSide={isServerSide}
+      />
     </Box>
   );
 }

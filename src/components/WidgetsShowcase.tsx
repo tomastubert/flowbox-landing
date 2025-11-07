@@ -10,7 +10,13 @@ import CarouselWidget from "@/components/widgets/CarouselWidget";
 import PhotowallWidget from "@/components/widgets/PhotowallWidget";
 import TikTokWidget from "@/components/widgets/TikTokWidget";
 
-export default function WidgetsShowcase() {
+interface WidgetsShowcaseProps {
+  isTestMode?: boolean;
+  isServerSide?: boolean;
+}
+
+
+export default function WidgetsShowcase({ isTestMode, isServerSide }: WidgetsShowcaseProps) {
   return (
     <Container maxWidth="xl" sx={{ py: 8 }}>
       <Box sx={{ mb: 8, textAlign: "center" }}>
@@ -27,7 +33,7 @@ export default function WidgetsShowcase() {
         <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 4 }}>
           V1 Widget (Legacy)
         </Typography>
-        <WidgetV1 />
+        <WidgetV1 isTestMode={isTestMode} isServerSide={isServerSide} />
       </Box>
 
       <Divider sx={{ my: 8 }}>
@@ -41,7 +47,7 @@ export default function WidgetsShowcase() {
         <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 4 }}>
           V2 Widgets
         </Typography>
-        
+
         <Grid container spacing={6}>
           <Grid size={12}>
             <Box>
@@ -51,7 +57,7 @@ export default function WidgetsShowcase() {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Horizontal scrolling display perfect for product showcases and testimonials
               </Typography>
-              <CarouselWidget />
+              <CarouselWidget isTestMode={isTestMode} isServerSide={isServerSide} />
             </Box>
           </Grid>
 
@@ -63,7 +69,7 @@ export default function WidgetsShowcase() {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Grid-based layout ideal for displaying user-generated content galleries
               </Typography>
-              <PhotowallWidget />
+              <PhotowallWidget isTestMode={isTestMode} isServerSide={isServerSide} />
             </Box>
           </Grid>
 
@@ -75,7 +81,7 @@ export default function WidgetsShowcase() {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Vertical video feed optimized for TikTok content integration
               </Typography>
-              <TikTokWidget />
+              <TikTokWidget isTestMode={isTestMode} isServerSide={isServerSide} />
             </Box>
           </Grid>
         </Grid>

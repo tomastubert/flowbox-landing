@@ -58,6 +58,7 @@ This project uses Next.js App Router (introduced in Next.js 13+):
 - **`src/components/`** - Reusable React components
   - `Navbar.tsx` - Application navigation bar with route highlighting
   - `WidgetsShowcase.tsx` - Reusable widgets showcase component (client component due to MUI hooks)
+  - `FlowboxEmbed.tsx` - Reusable Flowbox embed component with test/production environment support
 
 - **`src/components/widgets/`** - Widget components for showcasing different display styles
   - `FlowTester.tsx` - Interactive component for testing custom Flow Keys
@@ -150,12 +151,24 @@ const FlowboxEmbedFlow = () => {
 };
 ```
 
+### Reusable FlowboxEmbed Component
+A reusable component (`FlowboxEmbed.tsx`) that simplifies Flowbox integration:
+- **Props**:
+  - `flowKey`: The Flowbox flow key to render
+  - `locale`: Language/country code (default: "en-US")
+  - `containerId`: Unique ID for the container div
+  - `isTest`: Boolean to toggle between production and test environments
+- **Environment URLs**:
+  - Production: `https://connect.getflowbox.com/flowbox.js`
+  - Test: `https://connect.flowbox.me/flowbox.js`
+
 ### Configuration
 - **Flow Key**: Obtain from Flowbox dashboard ("Copy Flow Key" in the meatball menu)
 - **Locale**: Format is `language-COUNTRY` (not `language_COUNTRY`)
   - Translates UI text within the flow
   - Specifies which catalog to fetch product data from
 - **Container**: Must match the `id` of the target div element
+- **Environment**: Use `isTest={true}` for test/staging flows, `isTest={false}` (default) for production
 
 ### Widget Types
 - **Flow Tester**: Interactive component allowing users to input their own Flow Key and locale to render any flow in real-time
