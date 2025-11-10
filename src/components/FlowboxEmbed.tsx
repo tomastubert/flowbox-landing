@@ -75,7 +75,7 @@ export default function FlowboxEmbed({
 
   return (
     <>
-      <div id={containerId} ref={containerRef}></div>
+      <div id={containerId} style={{ width: "100%", height: "100%" }} ref={containerRef}></div>
       {scriptError && (
         <div style={{ color: "red", marginTop: 16, textAlign: "center" }}>{scriptError}</div>
       )}

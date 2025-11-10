@@ -84,7 +84,7 @@ export default function FlowTester() {
           disabled={isRendered}
         />
 
-        <FormControlLabel
+        {/* <FormControlLabel
           control={
             <Checkbox
               checked={isTest}
@@ -102,7 +102,7 @@ export default function FlowTester() {
               </Typography>
             </Box>
           }
-        />
+        /> */}
 
         <Box sx={{ display: "flex", gap: 2 }}>
           <Button
@@ -160,6 +160,7 @@ export default function FlowTester() {
             // locale={locale}
             containerId={`flowbox-tester-${renderKey}`}
             isTest={isTest}
+            isServerSide={true}
           />
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", p: 4 }}>
