@@ -22,11 +22,10 @@ export default function FlowboxEmbed({
   const [scriptError, setScriptError] = useState<string | null>(null);
 
   useEffect(() => {
-    const scriptUrl = isTest
-      ? "https://connect.flowbox.me/flowbox.js"
-      : "https://connect.getflowbox.com/flowbox.js";
+    const scriptUrl = process.env.NEXT_PUBLIC_FLX_URL || 'https://connect.flowbox.me/flowbox.js';
 
     const initializeFlowbox = () => {
+      console.log("Initializing Flowbox with key:", flowKey, window.flowbox);
       if (window.flowbox && containerRef.current) {
         window.flowbox("init", {
           container: `#${containerId}`,
@@ -59,19 +58,19 @@ export default function FlowboxEmbed({
       initializeFlowbox();
     }
 
-    // // Cleanup: remove script on unmount
-    // return () => {
-    //   const scriptToRemove = document.getElementById(scriptId);
-    //   if (scriptToRemove && scriptToRemove.parentNode) {
-    //     scriptToRemove.parentNode.removeChild(scriptToRemove);
-    //     console.log(`Removed Flowbox script: ${scriptId}`);
-    //     if (window.flowbox) {
-    //       window.flowbox('destroy', {
-    //         container: `#${containerId}`,
-    //       });
-    //     }
-    //   }
-    // };
+    // Cleanup: remove script on unmount
+    return () => {
+      const scriptToRemove = document.getElementById(scriptId);
+      if (scriptToRemove && scriptToRemove.parentNode) {
+        scriptToRemove.parentNode.removeChild(scriptToRemove);
+        console.log(`Removed Flowbox script: ${scriptId}`);
+        if (window.flowbox) {
+          window.flowbox('destroy', {
+            container: `#${containerId}`,
+          });
+        }
+      }
+    };
   }, [flowKey, locale, containerId, isTest, isServerSide]);
 
   return (
