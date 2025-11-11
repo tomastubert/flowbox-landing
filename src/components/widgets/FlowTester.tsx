@@ -18,6 +18,7 @@ export default function FlowTester() {
   const [flowKey, setFlowKey] = useState("");
   const [locale, setLocale] = useState();
   const [isTest, setIsTest] = useState(false);
+  const [allowCookies, setAllowCookies] = useState(false);
   const [error, setError] = useState("");
   const [isRendered, setIsRendered] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
@@ -104,6 +105,23 @@ export default function FlowTester() {
           }
         /> */}
 
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={allowCookies}
+              onChange={(e) => setAllowCookies(e.target.checked)}
+              disabled={isRendered}
+            />
+          }
+          label={
+            <Box>
+              <Typography variant="body2">
+                Set Allow Cookies
+              </Typography>
+            </Box>
+          }
+        />
+
         <Box sx={{ display: "flex", gap: 2 }}>
           <Button
             variant="contained"
@@ -161,6 +179,7 @@ export default function FlowTester() {
             containerId={`flowbox-tester-${renderKey}`}
             isTest={isTest}
             isServerSide={true}
+            allowCookies={allowCookies}
           />
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", p: 4 }}>

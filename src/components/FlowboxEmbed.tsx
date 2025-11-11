@@ -8,6 +8,7 @@ interface FlowboxEmbedProps {
   containerId: string;
   isTest?: boolean;
   isServerSide?: boolean;
+  allowCookies?: boolean;
 }
 
 export default function FlowboxEmbed({
@@ -16,6 +17,7 @@ export default function FlowboxEmbed({
   containerId,
   isTest = false,
   isServerSide = false,
+  allowCookies = false,
 }: FlowboxEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
@@ -25,13 +27,13 @@ export default function FlowboxEmbed({
     const scriptUrl = process.env.NEXT_PUBLIC_FLX_URL || 'https://connect.flowbox.me/flowbox.js';
 
     const initializeFlowbox = () => {
-      console.log("Initializing Flowbox with key:", flowKey, window.flowbox);
       if (window.flowbox && containerRef.current) {
         window.flowbox("init", {
           container: `#${containerId}`,
           key: flowKey,
           locale: locale,
           ...(isServerSide && { lazyLoad: false }),
+          ...(allowCookies && { allowCookies: true }),
         });
       }
     };
