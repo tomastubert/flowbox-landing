@@ -9,6 +9,7 @@ interface FlowboxEmbedProps {
   isTest?: boolean;
   isServerSide?: boolean;
   allowCookies?: boolean;
+  iframe: HTMLIFrameElement | null
 }
 
 export default function FlowboxEmbed({
@@ -18,19 +19,26 @@ export default function FlowboxEmbed({
   isTest = false,
   isServerSide = false,
   allowCookies = false,
+  iframe,
 }: FlowboxEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
   const [scriptError, setScriptError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Make sure we have both the container ref and flowkey
+    if (!containerRef.current || !flowKey) return undefined
     const scriptUrl = (isTest ? process.env.NEXT_PUBLIC_FLX_URL_TEST : process.env.NEXT_PUBLIC_FLX_URL) || 'https://connect.getflowbox.com/flowbox.js';
 
-    console.log(`Loading Flowbox script from: ${scriptUrl}`);
     const initializeFlowbox = () => {
       if (window.flowbox && containerRef.current) {
         window.flowbox("init", {
-          container: `#${containerId}`,
+          container: containerRef.current,
+          ...(iframe && {
+            previewIframeContainer: iframe,
+            preview: 'v2',
+            isPreview: true,
+          }),
           key: flowKey,
           locale: locale,
           ...(isServerSide && { lazyLoad: false }),
@@ -74,7 +82,7 @@ export default function FlowboxEmbed({
         }
       }
     };
-  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies]);
+  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies, iframe]);
 
   return (
     <>

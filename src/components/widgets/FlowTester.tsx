@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -15,10 +15,11 @@ import FlowboxEmbed from "@/components/FlowboxEmbed";
 
 
 import CircularProgress from "@mui/material/CircularProgress";
+import { createRoot } from "react-dom/client";
 
 interface FlowTesterProps {
   isTestMode?: boolean;
-}  
+}
 
 export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [flowKey, setFlowKey] = useState("");
@@ -29,6 +30,9 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [isRendered, setIsRendered] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
 
 
   const handleRenderFlow = () => {
@@ -71,6 +75,59 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
     }
   }
 
+  useEffect(() => {
+    console.log('viewMode changed to', viewMode)
+    console.log('iframeRef.current', iframeRef.current)
+    if (viewMode === 'desktop') return
+    const iframe = iframeRef.current
+    if (!iframe) return undefined
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+    if (!iframeDoc) return undefined
+
+    // Clear iframe content and set up basic HTML structure
+    iframeDoc.open()
+    iframeDoc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+          <div id="root"></div>
+        </body>
+      </html>
+    `)
+    iframeDoc.close()
+
+    // Wait for iframe to be ready, then render React component
+    const rootElement = iframeDoc.getElementById('root')
+    if (rootElement) {
+      console.log('Rendering FlowboxEmbed in iframe')
+      const root = createRoot(rootElement)
+      root.render(<FlowboxEmbed
+        key={renderKey}
+        flowKey={flowKey}
+        // locale={locale}
+        containerId={`flowbox-tester-${renderKey}`}
+        isTest={isTestMode}
+        isServerSide={true}
+        allowCookies={allowCookies}
+        iframe={iframeRef.current}
+      />)
+
+      // Cleanup function - defer unmount to avoid race condition with React rendering
+      return () => {
+        setTimeout(() => {
+          root.unmount()
+        }, 0)
+      }
+    }
+    return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flowKey, iframeRef.current, viewMode, isRendered])
+
   return (
     <Paper
       elevation={3}
@@ -96,6 +153,25 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 4 }}>
+        {/* Desktop/Mobile Toggle */}
+        <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
+          <Button
+            variant={viewMode === 'desktop' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setViewMode('desktop')}
+            sx={{ flex: 1 }}
+          >
+            Desktop
+          </Button>
+          <Button
+            variant={viewMode === 'mobile' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setViewMode('mobile')}
+            sx={{ flex: 1 }}
+          >
+            Mobile
+          </Button>
+        </Box>
         <TextField
           fullWidth
           label="Flow Key"
@@ -215,15 +291,48 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
             </Typography>
           </Box>
         ) : isRendered && flowKey ? (
-          <FlowboxEmbed
-            key={renderKey}
-            flowKey={flowKey}
-            // locale={locale}
-            containerId={`flowbox-tester-${renderKey}`}
-            isTest={isTestMode}
-            isServerSide={true}
-            allowCookies={allowCookies}
-          />
+          viewMode === 'mobile' ? (
+            <Box
+              component="iframe"
+              ref={iframeRef}
+              sx={{
+                width: 390,
+                height: 844,
+                aspectRatio: '390 / 844',
+                maxWidth: '100%',
+                margin: '0 auto',
+                boxShadow: 3,
+                borderRadius: 2,
+                overflow: 'hidden',
+                transition: 'width 0.3s',
+                border: '1px solid #ccc',
+                background: '#fff',
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                maxWidth: '100%',
+                margin: '0 auto',
+                boxShadow: 'none',
+                borderRadius: 0,
+                overflow: 'hidden',
+                transition: 'width 0.3s',
+              }}
+            >
+              <FlowboxEmbed
+                key={renderKey}
+                flowKey={flowKey}
+                // locale={locale}
+                containerId={`flowbox-tester-${renderKey}`}
+                isTest={isTestMode}
+                isServerSide={true}
+                allowCookies={allowCookies}
+                iframe={null}
+              />
+            </Box>
+          )
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", p: 4 }}>
             Your flow will appear here once you enter a Flow Key and click &quot;Render Flow&quot;
@@ -238,7 +347,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
         <Typography variant="caption" color="text.secondary" component="ul" sx={{ m: 0, pl: 2 }}>
           <li>Flow Keys are found in your Flowbox dashboard under Flows</li>
           <li>Use Test Environment for flows in your test/staging environment</li>
-          <li>Use the Reset button to clear and try a different flow</li>
+          <li>Use the Reset button to clear and try a different flow or refresh the view</li>
         </Typography>
       </Box>
     </Paper>
