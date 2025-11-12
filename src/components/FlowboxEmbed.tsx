@@ -9,7 +9,7 @@ interface FlowboxEmbedProps {
   isTest?: boolean;
   isServerSide?: boolean;
   allowCookies?: boolean;
-  iframe: HTMLIFrameElement | null
+  iframe?: HTMLIFrameElement | null
 }
 
 export default function FlowboxEmbed({
@@ -19,7 +19,7 @@ export default function FlowboxEmbed({
   isTest = false,
   isServerSide = false,
   allowCookies = false,
-  iframe,
+  iframe = null,
 }: FlowboxEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
