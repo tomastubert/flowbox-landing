@@ -24,8 +24,9 @@ export default function FlowboxEmbed({
   const [scriptError, setScriptError] = useState<string | null>(null);
 
   useEffect(() => {
-    const scriptUrl = process.env.NEXT_PUBLIC_FLX_URL || 'https://connect.flowbox.me/flowbox.js';
+    const scriptUrl = (isTest ? process.env.NEXT_PUBLIC_FLX_URL_TEST : process.env.NEXT_PUBLIC_FLX_URL) || 'https://connect.getflowbox.com/flowbox.js';
 
+    console.log(`Loading Flowbox script from: ${scriptUrl}`);
     const initializeFlowbox = () => {
       if (window.flowbox && containerRef.current) {
         window.flowbox("init", {

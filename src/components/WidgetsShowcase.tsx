@@ -29,12 +29,12 @@ export default function WidgetsShowcase({ isTestMode, isServerSide }: WidgetsSho
       </Box>
 
       {/* V1 Widget Section */}
-      <Box sx={{ mb: 10 }}>
+      {/* <Box sx={{ mb: 10 }}>
         <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 4 }}>
           V1 Widget (Legacy)
         </Typography>
         <WidgetV1 isTestMode={isTestMode} isServerSide={isServerSide} />
-      </Box>
+      </Box> */}
 
       <Divider sx={{ my: 8 }}>
         <Typography variant="overline" color="text.secondary" sx={{ px: 2 }}>
@@ -69,7 +69,7 @@ export default function WidgetsShowcase({ isTestMode, isServerSide }: WidgetsSho
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Grid-based layout ideal for displaying user-generated content galleries
               </Typography>
-              <PhotowallWidget isTestMode={isTestMode} isServerSide={isServerSide} />
+              {/* <PhotowallWidget isTestMode={isTestMode} isServerSide={isServerSide} /> */}
             </Box>
           </Grid>
 

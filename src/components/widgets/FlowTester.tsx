@@ -16,7 +16,11 @@ import FlowboxEmbed from "@/components/FlowboxEmbed";
 
 import CircularProgress from "@mui/material/CircularProgress";
 
-export default function FlowTester() {
+interface FlowTesterProps {
+  isTestMode?: boolean;
+}  
+
+export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [flowKey, setFlowKey] = useState("");
   const [locale, setLocale] = useState();
   const [isTest, setIsTest] = useState(false);
@@ -216,7 +220,7 @@ export default function FlowTester() {
             flowKey={flowKey}
             // locale={locale}
             containerId={`flowbox-tester-${renderKey}`}
-            isTest={isTest}
+            isTest={isTestMode}
             isServerSide={true}
             allowCookies={allowCookies}
           />
