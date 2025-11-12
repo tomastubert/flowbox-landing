@@ -12,6 +12,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import { PlayArrow, Refresh } from "@mui/icons-material";
 import FlowboxEmbed from "@/components/FlowboxEmbed";
+import MobileView from "@/components/widgets/MobileView";
 
 
 import CircularProgress from "@mui/material/CircularProgress";
@@ -95,6 +96,11 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
           <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body>
+        <style>
+         #flowbox-tester-${renderKey}{
+         margin-top:100px;
+         }
+        </style>
           <div id="root"></div>
         </body>
       </html>
@@ -292,23 +298,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
           </Box>
         ) : isRendered && flowKey ? (
           viewMode === 'mobile' ? (
-            <Box
-              component="iframe"
-              ref={iframeRef}
-              sx={{
-                width: 390,
-                height: 844,
-                aspectRatio: '390 / 844',
-                maxWidth: '100%',
-                margin: '0 auto',
-                boxShadow: 3,
-                borderRadius: 2,
-                overflow: 'hidden',
-                transition: 'width 0.3s',
-                border: '1px solid #ccc',
-                background: '#fff',
-              }}
-            />
+            <MobileView iframeRef={iframeRef} />
           ) : (
             <Box
               sx={{
