@@ -73,7 +73,7 @@ export default function FlowboxEmbed({
         }
       }
     };
-  }, [flowKey, locale, containerId, isTest, isServerSide]);
+  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies]);
 
   return (
     <>

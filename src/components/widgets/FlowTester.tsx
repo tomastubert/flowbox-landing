@@ -14,6 +14,8 @@ import { PlayArrow, Refresh } from "@mui/icons-material";
 import FlowboxEmbed from "@/components/FlowboxEmbed";
 
 
+import CircularProgress from "@mui/material/CircularProgress";
+
 export default function FlowTester() {
   const [flowKey, setFlowKey] = useState("");
   const [locale, setLocale] = useState();
@@ -22,16 +24,32 @@ export default function FlowTester() {
   const [error, setError] = useState("");
   const [isRendered, setIsRendered] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleRenderFlow = () => {
     if (!flowKey.trim()) {
       setError("Please enter a Flow Key");
       return;
     }
-
     setError("");
-    setIsRendered(true);
-    setRenderKey((prev) => prev + 1);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsRendered(true);
+      setRenderKey((prev) => prev + 1);
+      setIsLoading(false);
+    }, 400); // simulate loading for UX
+  };
+
+  // Update flow: destroy and re-initialize
+  const handleUpdateFlow = () => {
+    setIsLoading(true);
+    setIsRendered(false);
+    setTimeout(() => {
+      setIsRendered(true);
+      setRenderKey((prev) => prev + 1);
+      setIsLoading(false);
+    }, 400); // simulate loading for UX
   };
 
   const handleReset = () => {
@@ -40,13 +58,14 @@ export default function FlowTester() {
     setLocale(undefined);
     setIsTest(false);
     setError("");
+    setIsLoading(false);
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       handleRenderFlow();
     }
-  };
+  }
 
   return (
     <Paper
@@ -123,16 +142,28 @@ export default function FlowTester() {
         />
 
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<PlayArrow />}
-            onClick={handleRenderFlow}
-            disabled={isRendered || !flowKey.trim()}
-            sx={{ flex: 1 }}
-          >
-            Render Flow
-          </Button>
+          {!isRendered ? (
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<PlayArrow />}
+              onClick={handleRenderFlow}
+              disabled={!flowKey.trim()}
+              sx={{ flex: 1 }}
+            >
+              Render Flow
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<Refresh />}
+              onClick={handleUpdateFlow}
+              sx={{ flex: 1 }}
+            >
+              Update Flow
+            </Button>
+          )}
           <Button
             variant="outlined"
             size="large"
@@ -160,7 +191,7 @@ export default function FlowTester() {
       {/* Flow Container */}
       <Box
         sx={{
-          minHeight: isRendered ? 400 : 200,
+          minHeight: 400,
           backgroundColor: isRendered ? "transparent" : "#f5f5f5",
           borderRadius: 2,
           display: "flex",
@@ -169,9 +200,17 @@ export default function FlowTester() {
           border: "2px dashed",
           borderColor: isRendered ? "transparent" : "divider",
           transition: "all 0.3s ease",
+          position: "relative",
         }}
       >
-        {isRendered && flowKey ? (
+        {isLoading ? (
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" }}>
+            <CircularProgress color="primary" />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              Loading Flow...
+            </Typography>
+          </Box>
+        ) : isRendered && flowKey ? (
           <FlowboxEmbed
             key={renderKey}
             flowKey={flowKey}
