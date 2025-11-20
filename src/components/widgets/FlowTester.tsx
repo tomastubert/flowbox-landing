@@ -488,6 +488,10 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
                 isServerSide={true}
                 allowCookies={allowCookies}
                 iframe={null}
+                flowType={flowType}
+                tags={tags}
+                productIds={productIds}
+                operator={operator}
               />
             </Box>
           )

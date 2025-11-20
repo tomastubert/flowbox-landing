@@ -10,6 +10,7 @@ interface FlowboxEmbedProps {
   isServerSide?: boolean;
   allowCookies?: boolean;
   operator?: 'OR' | 'AND';
+  flowType?: 'dynamicTag' | 'dynamicProduct' | 'static';
   tags?: string[];
   productIds?: string[];
   iframe?: HTMLIFrameElement | null
@@ -24,6 +25,7 @@ export default function FlowboxEmbed({
   allowCookies = false,
   operator,
   tags,
+  flowType,
   productIds,
   iframe = null,
 }: FlowboxEmbedProps) {
@@ -47,9 +49,9 @@ export default function FlowboxEmbed({
           }),
           key: flowKey,
           locale: locale,
-          ...(operator && { operator }),
-          ...(tags && { tags }),
-          ...(productIds && { productIds }),
+          ...((flowType === 'dynamicTag' || flowType === 'dynamicProduct') && operator && { operator }),
+          ...(flowType === 'dynamicTag' && tags && { tags }),
+          ...(flowType === 'dynamicProduct' && productIds && { productIds }),
           ...(isServerSide && { lazyLoad: false }),
           ...(allowCookies && { allowCookies: true }),
         });
