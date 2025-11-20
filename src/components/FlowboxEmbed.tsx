@@ -9,6 +9,9 @@ interface FlowboxEmbedProps {
   isTest?: boolean;
   isServerSide?: boolean;
   allowCookies?: boolean;
+  operator?: 'OR' | 'AND';
+  tags?: string[];
+  productIds?: string[];
   iframe?: HTMLIFrameElement | null
 }
 
@@ -19,6 +22,9 @@ export default function FlowboxEmbed({
   isTest = false,
   isServerSide = false,
   allowCookies = false,
+  operator,
+  tags,
+  productIds,
   iframe = null,
 }: FlowboxEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,6 +47,9 @@ export default function FlowboxEmbed({
           }),
           key: flowKey,
           locale: locale,
+          ...(operator && { operator }),
+          ...(tags && { tags }),
+          ...(productIds && { productIds }),
           ...(isServerSide && { lazyLoad: false }),
           ...(allowCookies && { allowCookies: true }),
         });

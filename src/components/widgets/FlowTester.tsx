@@ -17,6 +17,9 @@ import MobileView from "@/components/widgets/MobileView";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import { createRoot } from "react-dom/client";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
 
 interface FlowTesterProps {
   isTestMode?: boolean;
@@ -32,8 +35,46 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [renderKey, setRenderKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [flowType, setFlowType] = useState<'static' | 'dynamicTag' | 'dynamicProduct'>('static');
+  const [operator, setOperator] = useState<'OR' | 'AND'>('OR');
+  const [tags, setTags] = useState<string[]>([]);
+  const [productIds, setProductIds] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState('');
+
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
+  const handleOperator = (event: SelectChangeEvent<'OR' | 'AND'>) => {
+    setOperator(event.target.value as 'OR' | 'AND')
+  }
+
+  // Handler for adding chips
+  const handleAddChip = () => {
+    const value = inputValue.trim();
+    if (!value) return;
+    if (flowType === 'dynamicTag' && !tags.includes(value)) {
+      setTags([...tags, value]);
+    } else if (flowType === 'dynamicProduct' && !productIds.includes(value)) {
+      setProductIds([...productIds, value]);
+    }
+    setInputValue('');
+  };
+
+  // Handler for deleting chips
+  const handleDeleteChip = (chip: string) => {
+    if (flowType === 'dynamicTag') {
+      setTags(tags.filter(t => t !== chip));
+    } else if (flowType === 'dynamicProduct') {
+      setProductIds(productIds.filter(id => id !== chip));
+    }
+  };
+
+  const onRemoveAll = () => {
+    if (flowType === 'dynamicTag') {
+      setTags([]);
+    } else if (flowType === 'dynamicProduct') {
+      setProductIds([]);
+    }
+  }
 
 
   const handleRenderFlow = () => {
@@ -68,6 +109,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
     setIsTest(false);
     setError("");
     setIsLoading(false);
+
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -159,6 +201,132 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 4 }}>
+        {/* Flow Type Selection */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <Button
+            variant={flowType === 'static' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setFlowType('static')}
+            disabled={isRendered}
+          >
+            Static
+          </Button>
+          <Button
+            variant={flowType === 'dynamicTag' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setFlowType('dynamicTag')}
+            disabled={isRendered}
+          >
+            Dynamic Tag
+          </Button>
+          <Button
+            variant={flowType === 'dynamicProduct' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setFlowType('dynamicProduct')}
+            disabled={isRendered}
+          >
+            Dynamic Product
+          </Button>
+        </Box>
+
+        {/* Operator Selection */}
+        {(flowType === 'dynamicTag' || flowType === 'dynamicProduct') && (
+          <Box
+            sx={{
+              pt: 3,
+              pb: 1,
+              mb: 1,
+              justifyContent: 'space-between',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="body2" color="text.secondary">
+                Posts must have
+              </Typography>
+              <FormControl size="small" variant="standard" sx={{ ml: 1 }}>
+                <Select
+                  value={operator}
+                  onChange={handleOperator}
+                  displayEmpty
+                  disableUnderline
+                  sx={{
+                    color: 'text.primary',
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    lineHeight: 1.43,
+                    '& .MuiSelect-select': {
+                      p: 0,
+                      fontWeight: 400,
+                      lineHeight: 1.43,
+                      background: 'none',
+                      border: 'none',
+                    },
+                    '& .MuiSelect-icon': {
+                      right: 0,
+                      color: 'text.primary',
+                    },
+                    '&:before, &:after': {
+                      display: 'none',
+                    },
+                    '&:hover': {
+                      color: 'primary.main',
+                      '& .MuiSelect-icon': {
+                        color: 'primary.main',
+                      },
+                    },
+                  }}
+                >
+                  <MenuItem value="OR">at least one of these products</MenuItem>
+                  <MenuItem value="AND">all of the selected products</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Button onClick={() => onRemoveAll()}>Remove All</Button>
+          </Box>
+        )}
+
+        {/* Chip Input for Tags or Product IDs */}
+        {(flowType === 'dynamicTag' || flowType === 'dynamicProduct') && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              {flowType === 'dynamicTag' ? 'Tags' : 'Product IDs'}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <TextField
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleAddChip();
+                }}
+                placeholder={`Add ${flowType === 'dynamicTag' ? 'tag' : 'product ID'}`}
+                disabled={isRendered}
+                size="small"
+                sx={{ flex: 1 }}
+              />
+              <Button
+                onClick={handleAddChip}
+                disabled={isRendered || !inputValue.trim()}
+                variant="outlined"
+                size="small"
+              >
+                Add
+              </Button>
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {(flowType === 'dynamicTag' ? tags : productIds).map(chip => (
+                <Chip
+                  key={chip}
+                  label={chip}
+                  onDelete={() => handleDeleteChip(chip)}
+                  disabled={isRendered}
+                  sx={{ mb: 0.5 }}
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
         {/* Desktop/Mobile Toggle */}
         <Box sx={{ display: "flex", gap: 2, mb: 1 }}>
           <Button
