@@ -27,7 +27,7 @@ interface FlowTesterProps {
 
 export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [flowKey, setFlowKey] = useState("");
-  const [locale, setLocale] = useState();
+  const [locale, setLocale] = useState<string>("");
   const [isTest, setIsTest] = useState(false);
   const [allowCookies, setAllowCookies] = useState(false);
   const [error, setError] = useState("");
@@ -105,7 +105,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const handleReset = () => {
     setIsRendered(false);
     setFlowKey("");
-    setLocale(undefined);
+    setLocale("");
     setIsTest(false);
     setError("");
     setIsLoading(false);
@@ -201,6 +201,18 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mb: 4 }}>
+        {/* Locale Input */}
+        <TextField
+          fullWidth
+          label="Locale"
+          placeholder="e.g., en-US, es-ES, etc."
+          value={locale || ''}
+          onChange={e => setLocale(e.target.value)}
+          variant="outlined"
+          helperText="Set a custom locale (optional)"
+          disabled={isRendered}
+          sx={{ mb: 2 }}
+        />
         {/* Flow Type Selection */}
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <Button
@@ -482,7 +494,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
               <FlowboxEmbed
                 key={renderKey}
                 flowKey={flowKey}
-                // locale={locale}
+                locale={locale}
                 containerId={`flowbox-tester-${renderKey}`}
                 isTest={isTestMode}
                 isServerSide={true}

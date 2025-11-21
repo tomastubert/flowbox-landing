@@ -48,7 +48,7 @@ export default function FlowboxEmbed({
             isPreview: true,
           }),
           key: flowKey,
-          locale: locale,
+          ...(locale && { locale }),
           ...((flowType === 'dynamicTag' || flowType === 'dynamicProduct') && operator && { operator }),
           ...(flowType === 'dynamicTag' && tags && { tags }),
           ...(flowType === 'dynamicProduct' && productIds && { productIds }),
@@ -93,7 +93,7 @@ export default function FlowboxEmbed({
         }
       }
     };
-  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies, iframe]);
+  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies, iframe, flowType, operator, tags, productIds]);
 
   return (
     <>
