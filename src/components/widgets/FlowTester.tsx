@@ -28,14 +28,13 @@ interface FlowTesterProps {
 export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [flowKey, setFlowKey] = useState("");
   const [locale, setLocale] = useState<string>("");
-  const [isTest, setIsTest] = useState(false);
   const [allowCookies, setAllowCookies] = useState(false);
   const [error, setError] = useState("");
   const [isRendered, setIsRendered] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [flowType, setFlowType] = useState<'static' | 'dynamicTag' | 'dynamicProduct'>('static');
+  const [flowType, setFlowType] = useState<'static' | 'dynamicTag' | 'dynamicProduct' | 'dynamicTagLegacy' | 'dynamicProductLegacy'>('static');
   const [operator, setOperator] = useState<'OR' | 'AND'>('OR');
   const [tags, setTags] = useState<string[]>([]);
   const [productIds, setProductIds] = useState<string[]>([]);
@@ -53,7 +52,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
     if (!value) return;
     if (flowType === 'dynamicTag' && !tags.includes(value)) {
       setTags([...tags, value]);
-    } else if (flowType === 'dynamicProduct' && !productIds.includes(value)) {
+    } else if ((flowType === 'dynamicProduct' || flowType === 'dynamicProductLegacy') && !productIds.includes(value)) {
       setProductIds([...productIds, value]);
     }
     setInputValue('');
@@ -63,7 +62,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const handleDeleteChip = (chip: string) => {
     if (flowType === 'dynamicTag') {
       setTags(tags.filter(t => t !== chip));
-    } else if (flowType === 'dynamicProduct') {
+    } else if (flowType === 'dynamicProduct' || flowType === 'dynamicProductLegacy') {
       setProductIds(productIds.filter(id => id !== chip));
     }
   };
@@ -106,7 +105,6 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
     setIsRendered(false);
     setFlowKey("");
     setLocale("");
-    setIsTest(false);
     setError("");
     setIsLoading(false);
 
@@ -119,8 +117,6 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
   }
 
   useEffect(() => {
-    console.log('viewMode changed to', viewMode)
-    console.log('iframeRef.current', iframeRef.current)
     if (viewMode === 'desktop') return
     const iframe = iframeRef.current
     if (!iframe) return undefined
@@ -152,17 +148,20 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
     // Wait for iframe to be ready, then render React component
     const rootElement = iframeDoc.getElementById('root')
     if (rootElement) {
-      console.log('Rendering FlowboxEmbed in iframe')
       const root = createRoot(rootElement)
       root.render(<FlowboxEmbed
         key={renderKey}
         flowKey={flowKey}
-        // locale={locale}
+        locale={locale}
         containerId={`flowbox-tester-${renderKey}`}
         isTest={isTestMode}
         isServerSide={true}
         allowCookies={allowCookies}
         iframe={iframeRef.current}
+        flowType={flowType}
+        tags={tags}
+        productIds={productIds}
+        operator={operator}
       />)
 
       // Cleanup function - defer unmount to avoid race condition with React rendering
@@ -239,10 +238,26 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
           >
             Dynamic Product
           </Button>
+          <Button
+            variant={flowType === 'dynamicTagLegacy' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setFlowType('dynamicTagLegacy')}
+            disabled={isRendered}
+          >
+            Dynamic Tag Legacy
+          </Button>
+          <Button
+            variant={flowType === 'dynamicProductLegacy' ? 'contained' : 'outlined'}
+            color="primary"
+            onClick={() => setFlowType('dynamicProductLegacy')}
+            disabled={isRendered}
+          >
+            Dynamic Product Legacy
+          </Button>
         </Box>
 
         {/* Operator Selection */}
-        {(flowType === 'dynamicTag' || flowType === 'dynamicProduct') && (
+        {(flowType === 'dynamicTag' || (flowType === 'dynamicProduct') || (flowType === 'dynamicTagLegacy')) && (
           <Box
             sx={{
               pt: 3,
@@ -300,10 +315,10 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
         )}
 
         {/* Chip Input for Tags or Product IDs */}
-        {(flowType === 'dynamicTag' || flowType === 'dynamicProduct') && (
+        {(flowType === 'dynamicTag' || flowType === 'dynamicTagLegacy' || flowType === 'dynamicProduct' || flowType === 'dynamicProductLegacy') && (
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              {flowType === 'dynamicTag' ? 'Tags' : 'Product IDs'}
+              {(flowType === 'dynamicTag' || flowType === 'dynamicTagLegacy') ? 'Tags' : 'Product IDs'}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
               <TextField
@@ -312,8 +327,8 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
                 onKeyDown={e => {
                   if (e.key === 'Enter') handleAddChip();
                 }}
-                placeholder={`Add ${flowType === 'dynamicTag' ? 'tag' : 'product ID'}`}
-                disabled={isRendered}
+                placeholder={`Add ${(flowType === 'dynamicTag' || flowType === 'dynamicTagLegacy') ? 'tag' : 'product ID'}`}
+                disabled={isRendered || (flowType === 'dynamicProductLegacy' && productIds.length >= 1)}
                 size="small"
                 sx={{ flex: 1 }}
               />
@@ -369,26 +384,6 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
           helperText="Paste your Flow Key from the Flowbox dashboard"
           disabled={isRendered}
         />
-
-        {/* <FormControlLabel
-          control={
-            <Checkbox
-              checked={isTest}
-              onChange={(e) => setIsTest(e.target.checked)}
-              disabled={isRendered}
-            />
-          }
-          label={
-            <Box>
-              <Typography variant="body2">
-                Use Test Environment
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {isTest ? "https://connect.flowbox.me" : "https://connect.getflowbox.com"}
-              </Typography>
-            </Box>
-          }
-        /> */}
 
         <FormControlLabel
           control={

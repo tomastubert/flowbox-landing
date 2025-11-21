@@ -10,7 +10,7 @@ interface FlowboxEmbedProps {
   isServerSide?: boolean;
   allowCookies?: boolean;
   operator?: 'OR' | 'AND';
-  flowType?: 'dynamicTag' | 'dynamicProduct' | 'static';
+  flowType?: 'dynamicTag' | 'dynamicProduct' | 'static' | 'dynamicTagLegacy' | 'dynamicProductLegacy';
   tags?: string[];
   productIds?: string[];
   iframe?: HTMLIFrameElement | null
@@ -49,6 +49,8 @@ export default function FlowboxEmbed({
           }),
           key: flowKey,
           ...(locale && { locale }),
+          ...(flowType === 'dynamicTagLegacy' && { tagsOperator: operator }),
+          ...(flowType === 'dynamicProductLegacy' && productIds && { productId: productIds[0] }),
           ...((flowType === 'dynamicTag' || flowType === 'dynamicProduct') && operator && { operator }),
           ...(flowType === 'dynamicTag' && tags && { tags }),
           ...(flowType === 'dynamicProduct' && productIds && { productIds }),
@@ -85,7 +87,6 @@ export default function FlowboxEmbed({
       const scriptToRemove = document.getElementById(scriptId);
       if (scriptToRemove && scriptToRemove.parentNode) {
         scriptToRemove.parentNode.removeChild(scriptToRemove);
-        console.log(`Removed Flowbox script: ${scriptId}`);
         if (window.flowbox) {
           window.flowbox('destroy', {
             container: `#${containerId}`,
