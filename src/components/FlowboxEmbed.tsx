@@ -52,7 +52,7 @@ export default function FlowboxEmbed({
           ...(flowType === 'dynamicTagLegacy' && { tagsOperator: operator }),
           ...(flowType === 'dynamicProductLegacy' && productIds && { productId: productIds[0] }),
           ...((flowType === 'dynamicTag' || flowType === 'dynamicProduct') && operator && { operator }),
-          ...(flowType === 'dynamicTag' && tags && { tags }),
+          ...((flowType === 'dynamicTag' || flowType === 'dynamicTagLegacy') && tags && { tags }),
           ...(flowType === 'dynamicProduct' && productIds && { productIds }),
           ...(isServerSide && { lazyLoad: false }),
           ...(allowCookies && { allowCookies: true }),
