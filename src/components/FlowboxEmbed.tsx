@@ -9,6 +9,7 @@ interface FlowboxEmbedProps {
   isTest?: boolean;
   isServerSide?: boolean;
   allowCookies?: boolean;
+  enforceV2?: boolean;
   operator?: 'OR' | 'AND';
   flowType?: 'dynamicTag' | 'dynamicProduct' | 'static' | 'dynamicTagLegacy' | 'dynamicProductLegacy';
   tags?: string[];
@@ -28,6 +29,7 @@ export default function FlowboxEmbed({
   flowType,
   productIds,
   iframe = null,
+  enforceV2 = false,
 }: FlowboxEmbedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
@@ -46,6 +48,9 @@ export default function FlowboxEmbed({
             previewIframeContainer: iframe,
             preview: 'v2',
             isPreview: true,
+          }),
+          ...(enforceV2 && {
+            preview: 'v2',
           }),
           key: flowKey,
           ...(locale && { locale }),
@@ -94,7 +99,7 @@ export default function FlowboxEmbed({
         }
       }
     };
-  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies, iframe, flowType, operator, tags, productIds]);
+  }, [flowKey, locale, containerId, isTest, isServerSide, allowCookies, iframe, flowType, operator, tags, productIds, enforceV2]);
 
   return (
     <>

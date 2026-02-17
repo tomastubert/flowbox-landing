@@ -20,6 +20,7 @@ import { createRoot } from "react-dom/client";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
+import Stack from "@mui/material/Stack";
 
 interface FlowTesterProps {
   isTestMode?: boolean;
@@ -29,6 +30,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
   const [flowKey, setFlowKey] = useState("");
   const [locale, setLocale] = useState<string>("");
   const [allowCookies, setAllowCookies] = useState(false);
+  const [enforceV2, setEnforceV2] = useState(false);
   const [error, setError] = useState("");
   const [isRendered, setIsRendered] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
@@ -162,6 +164,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
         tags={tags}
         productIds={productIds}
         operator={operator}
+        enforceV2={enforceV2}
       />)
 
       // Cleanup function - defer unmount to avoid race condition with React rendering
@@ -173,7 +176,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
     }
     return undefined
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flowKey, iframeRef.current, viewMode, isRendered])
+  }, [flowKey, iframeRef.current, viewMode, isRendered, enforceV2])
 
   return (
     <Paper
@@ -384,23 +387,42 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
           helperText="Paste your Flow Key from the Flowbox dashboard"
           disabled={isRendered}
         />
+        <Stack direction="row" spacing={2} alignItems="center">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={allowCookies}
+                onChange={(e) => setAllowCookies(e.target.checked)}
+                disabled={isRendered}
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="body2">
+                  Set Allow Cookies
+                </Typography>
+              </Box>
+            }
+          />
 
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={allowCookies}
-              onChange={(e) => setAllowCookies(e.target.checked)}
-              disabled={isRendered}
-            />
-          }
-          label={
-            <Box>
-              <Typography variant="body2">
-                Set Allow Cookies
-              </Typography>
-            </Box>
-          }
-        />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={enforceV2}
+                onChange={(e) => setEnforceV2(e.target.checked)}
+                disabled={isRendered}
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="body2">
+                  Enforce V2
+                </Typography>
+              </Box>
+            }
+          />
+        </Stack>
+
 
         <Box sx={{ display: "flex", gap: 2 }}>
           {!isRendered ? (
@@ -499,6 +521,7 @@ export default function FlowTester({ isTestMode }: FlowTesterProps) {
                 tags={tags}
                 productIds={productIds}
                 operator={operator}
+                enforceV2={enforceV2}
               />
             </Box>
           )
